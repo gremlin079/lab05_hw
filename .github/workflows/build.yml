@@ -27,6 +27,8 @@ jobs:
       - name: Generate Coverage
         run: |
           cd build
-          gcovr --exclude-unreachable-branches --exclude-throw-branches \
-                --exclude '/usr/.*' --exclude '.*/tests/.*' \
-                --root .. --xml --output coverage.xml
+          lcov --capture --directory . --output-file coverage.info --rc lcov_branch_coverage=1 \
+               --ignore-errors mismatch --ignore-errors unused --ignore-errors empty
+          lcov --remove coverage.info '/usr/*' '*/tests/*' --output-file coverage.info \
+               --rc lcov_branch_coverage=1
+          genhtml coverage.info --output-directory coverage_report --ignore-errors mismatch
