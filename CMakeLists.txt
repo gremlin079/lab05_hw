@@ -24,9 +24,15 @@ add_executable(banking_tests
     tests/TransactionTest.cpp
 )
 
+target_include_directories(banking_tests PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+
 target_link_libraries(banking_tests
     PRIVATE
     banking
     gtest
+    gmock
     gtest_main
 )
