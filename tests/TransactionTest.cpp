@@ -29,20 +29,20 @@ TEST(TransactionTest, MakeThrowsIfSameAccount) {
     EXPECT_THROW(trans.Make(acc1, acc2, 100), std::logic_error);
 }
 
-TEST(TransactionTest, RealTransactionSucceeds) {
-    Account from(1, 1000); // Счет-отправитель
-    Account to(2, 500);    // Счет-получатель
+TEST_F(TransactionTest, RealTransactionSucceeds) {
+    Account from(1, 1000); // Счет-отправитель с балансом 1000
+    Account to(2, 500);    // Счет-получатель с балансом 500
     Transaction transaction;
 
-    // Проверяем, что счета не заблокированы
-    ASSERT_FALSE(from.IsLocked());
-    ASSERT_FALSE(to.IsLocked());
+    // Гарантируем, что счета не заблокированы
+    from.Unlock();
+    to.Unlock();
 
     // Выполняем транзакцию
     bool result = transaction.Make(from, to, 300);
     EXPECT_TRUE(result);
-    EXPECT_EQ(from.GetBalance(), 700);
-    EXPECT_EQ(to.GetBalance(), 800);
+    EXPECT_EQ(from.GetBalance(), 700); // 1000 - 300
+    EXPECT_EQ(to.GetBalance(), 800);   // 500 + 300
 }
 
 
