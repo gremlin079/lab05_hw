@@ -41,10 +41,11 @@ TEST(TransactionTest, RealTransactionSucceeds) {
     Transaction t;
     t.set_fee(10);
 
-    bool success = t.Make(from, to, 200);
+    bool success = t.Make(from, to, 300);
 
     EXPECT_TRUE(success);
-    EXPECT_EQ(from.GetBalance(), 1000 - 200 - 10);
-    EXPECT_EQ(to.GetBalance(), 500 + 200);
+    EXPECT_EQ(from.GetBalance(), 1000 - 300 - 10);
+    EXPECT_EQ(to.GetBalance(), 500 + 300);
+}
 }
 
