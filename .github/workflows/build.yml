@@ -27,20 +27,13 @@ jobs:
       - name: Generate Coverage Data
         run: |
           cd build
-          lcov --capture --directory "$PWD" --output-file coverage.info \
-               --branch-coverage \
-               --no-external \
-               --exclude "$PWD/tests/*" \
-               --exclude "$PWD/_deps/*" \
-               --exclude "/usr/*" \
-               --ignore-errors unused,empty
-          lcov --extract coverage.info "$PWD/CMakeFiles/banking.dir/banking/*.gcda" --output-file coverage_filtered.info \
-               --ignore-errors empty,unused
-          genhtml coverage_filtered.info --output-directory coverage_report \
-               --branch-coverage \
-               --title "Code Coverage" \
-               --ignore-errors source,empty
-          lcov --list coverage_filtered.info
+          gcovr -r .. \
+                --exclude='tests/.*' \
+                --exclude='_deps/.*' \
+                --coveralls \
+                --output=coveralls.json \
+                --gcov-ignore-parse-errors
+          curl -F json_file=@coveralls.json https://coveralls.io/api/v1/jobs
 
 
       - name: Upload to Coveralls
