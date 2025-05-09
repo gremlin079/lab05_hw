@@ -23,6 +23,7 @@ Transaction::Transaction() : fee_(1) {}
 Transaction::~Transaction() {}
 
 bool Transaction::Make(Account& from, Account& to, int sum) {
+  std::cout << "Transaction::Make called: sum=" << sum << std::endl;
   if (from.id() == to.id()) throw std::logic_error("invalid action");
 
   if (sum < 0) throw std::invalid_argument("sum can't be negative");
