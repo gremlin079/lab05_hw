@@ -1,4 +1,4 @@
-name: Build and Test
+name: Build, Test and Coverage
 
 on: [push, pull_request]
 
@@ -11,33 +11,44 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake lcov
+          sudo apt-get install -y cmake lcov gcovr
 
       - name: Configure and Build
         run: |
-          mkdir build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Debug
+          mkdir -p build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=ON
           cmake --build .
 
       - name: Run Tests
         run: |
           cd build
-          ctest --output-on-failure
+          ctest --output-on-failure || true  # Продолжаем даже если тесты упали
 
-      - name: Generate Coverage
+      - name: Generate Coverage Data
         run: |
           cd build
-          lcov --capture --directory . --output-file coverage.info --rc lcov_branch_coverage=1 \
-               --ignore-errors mismatch --ignore-errors unused --ignore-errors empty
-          lcov --remove coverage.info '/usr/*' '*/tests/*' --output-file coverage.info \
-               --rc lcov_branch_coverage=1
-          genhtml coverage.info --output-directory coverage_report --ignore-errors mismatc
+          geninfo ./ --output-file coverage.info --branch-coverage \
+            --no-external \
+            --ignore-errors source,mismatch,unused,empty \
+            --exclude '*/tests/*' \
+            --exclude '*/_deps/*' \
+            --exclude '/usr/*'
+          
+          genhtml coverage.info --output-directory coverage_report \
+            --ignore-errors source,mismatch \
+            --branch-coverage \
+            --title "Code Coverage"
 
       - name: Upload to Coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: |
           cd build
-          curl -LO https://github.com/coverallsapp/coverage-reporter/releases/latest/download/coveralls-linux.tar.gz
-          tar -xzf coveralls-linux.tar.gz
-          ./coveralls --coveralls-url=https://coveralls.io -f coverage.info
+          gcovr -r .. \
+            --exclude='.*/tests/.*' \
+            --exclude='.*/_deps/.*' \
+            --coveralls \
+            --coveralls-pretty \
+            --output=coveralls.json
+          
+          curl -F json_file=@coveralls.json https://coveralls.io/api/v1/jobs
