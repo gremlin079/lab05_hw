@@ -36,17 +36,20 @@ jobs:
           curl -F json_file=@coveralls.json https://coveralls.io/api/v1/jobs
 
 
-      - name: Force Coveralls Upload
+      - name: Upload to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Добавьте эту строку
         run: |
           cd build
-          pip install coveralls-merge
-          echo '{
-            "source_files": [
-              {
-                "name": "banking/Account.cpp",
-                "coverage": [1, 1, null]
-              }
-            ]
-          }' > minimal.json
-          coveralls-merge minimal.json --output merged.json
-          curl -F json_file=@merged.json "https://coveralls.io/api/v1/jobs?repo_token=$COVERALLS_REPO_TOKEN"
+          pip install gcovr
+          gcovr -r .. \
+                --exclude='tests/.*' \
+                --exclude='_deps/.*' \
+                --coveralls \
+                --coveralls-pretty \
+                --output=coveralls.json
+          curl -X POST \
+               -H "Content-Type: application/json" \
+               -d @coveralls.json \
+               "https://coveralls.io/api/v1/jobs?repo_token=$COVERALLS_REPO_TOKEN"
