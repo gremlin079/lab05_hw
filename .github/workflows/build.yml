@@ -27,7 +27,6 @@ jobs:
       - name: Generate Coverage Data
         run: |
           cd build
-          find . -name "*.gcda" -delete
           ./banking_tests || true
           lcov --capture --directory "$PWD" --output-file coverage.info \
                --branch-coverage \
@@ -38,10 +37,11 @@ jobs:
                --ignore-errors unused
           lcov --extract coverage.info "$PWD/banking/*" --output-file coverage_filtered.info
           genhtml coverage_filtered.info --output-directory coverage_report \
-                 --branch-coverage \
-                 --title "Code Coverage" \
-                 --ignore-errors source
+               --branch-coverage \
+               --title "Code Coverage" \
+               --ignore-errors source
           lcov --list coverage_filtered.info
+
 
       - name: Upload to Coveralls
         env:
