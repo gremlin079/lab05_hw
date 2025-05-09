@@ -47,5 +47,5 @@ TEST(TransactionTest, RealTransactionSucceeds) {
     EXPECT_EQ(from.GetBalance(), 1000 - 300 - 10);
     EXPECT_EQ(to.GetBalance(), 500 + 300);
 }
-}
+
 
