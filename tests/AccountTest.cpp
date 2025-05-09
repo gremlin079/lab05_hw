@@ -24,3 +24,11 @@ TEST(AccountTest, ChangeBalanceFailsIfNotLocked) {
     Account acc(1, 1000);
     EXPECT_THROW(acc.ChangeBalance(100), std::runtime_error);
 }
+
+TEST(AccountTest, LockUnlockAndChangeBalance) {
+    Account acc(1, 100);
+    acc.Lock();
+    acc.ChangeBalance(50);
+    acc.Unlock();
+    EXPECT_EQ(acc.GetBalance(), 150);
+}
