@@ -51,8 +51,8 @@ TEST_F(TransactionTest, TransactionCallsChangeBalance) {
     Account from(1, 1000);
     Account to(2, 500);
     Transaction transaction;
-    from.Lock();
-    to.Lock();
+    from.Unlock();
+    to.Unlock();
     bool result = transaction.Make(from, to, 200);
     EXPECT_TRUE(result);
     EXPECT_EQ(from.GetBalance(), 1000);
