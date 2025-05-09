@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(banking
     banking/Account.cpp
-    bankingTransaction.cpp
+    banking/Transaction.cpp
 )
 
 include(FetchContent)
