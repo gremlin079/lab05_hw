@@ -36,3 +36,5 @@ target_link_libraries(banking_tests
     gmock
     gtest_main
 )
+enable_testing()
+add_test(NAME banking_tests COMMAND banking_tests)
