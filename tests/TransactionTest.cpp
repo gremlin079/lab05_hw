@@ -30,7 +30,6 @@ TEST(TransactionTest, MakeThrowsIfSameAccount) {
 }
 
 TEST(TransactionTest, RealTransactionSucceeds) {
-   TEST_F(TransactionTest, RealTransactionSucceeds) {
     Account from(1, 1000); // Счет-отправитель
     Account to(2, 500);    // Счет-получатель
     Transaction transaction;
