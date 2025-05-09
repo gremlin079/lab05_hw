@@ -34,12 +34,13 @@ jobs:
                --exclude "$PWD/tests/*" \
                --exclude "$PWD/_deps/*" \
                --exclude "/usr/*" \
-               --ignore-errors unused
-          lcov --extract coverage.info "$PWD/banking/*" --output-file coverage_filtered.info
+               --ignore-errors unused,empty
+          lcov --extract coverage.info "$PWD/banking/*" --output-file coverage_filtered.info \
+               --ignore-errors empty
           genhtml coverage_filtered.info --output-directory coverage_report \
                --branch-coverage \
                --title "Code Coverage" \
-               --ignore-errors source
+               --ignore-errors source,empty
           lcov --list coverage_filtered.info
 
 
