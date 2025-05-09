@@ -14,10 +14,9 @@ target_include_directories(banking PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-if(COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+if(COVERAGE)
     message(STATUS "Coverage build enabled")
-    target_compile_options(banking PRIVATE --coverage -fprofile-arcs -ftest-coverage)
-    target_link_libraries(banking PRIVATE --coverage)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -O0")
 endif()
 
 include(FetchContent)
@@ -32,9 +31,9 @@ add_executable(banking_tests
     tests/TransactionTest.cpp
 )
 
-if(COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(banking_tests PRIVATE --coverage -fprofile-arcs -ftest-coverage)
-    target_link_libraries(banking_tests PRIVATE --coverage)
+if(COVERAGE)
+    message(STATUS "Coverage build enabled")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -O0")
 endif()
 
 target_include_directories(banking_tests PRIVATE
