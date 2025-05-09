@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "../Transaction.h"
-#include "../Account.h"
+#include "banking/Transaction.h"
+#include "banking/Account.h"
 
 class MockTransaction : public Transaction {
 public:
