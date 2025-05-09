@@ -1,36 +1,36 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <sstream>
 #include "banking/Transaction.h"
 #include "banking/Account.h"
 
-class TransactionWrapper : public Transaction {
-public:
-    void TestableSaveToDataBase(Account& from, Account& to, int sum) {
-        SaveToDataBase(from, to, sum);
-    }
-};
+using ::testing::HasSubstr;
 
-class MockTransaction : public TransactionWrapper {
-public:
-    MOCK_METHOD(void, TestableSaveToDataBase, (Account&, Account&, int));
-
-    void SaveToDataBase(Account& from, Account& to, int sum) override {
-        TestableSaveToDataBase(from, to, sum);
-    }
-};
-
-TEST(TransactionTest, MakeCallsSaveToDataBase) {
-    MockTransaction trans;
+TEST(TransactionTest, MakeOutputsCorrectInfo) {
+    Transaction trans;
     Account acc1(1, 1000), acc2(2, 1000);
+
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
     
-    EXPECT_CALL(trans, TestableSaveToDataBase(testing::Ref(acc1), testing::Ref(acc2), 200))
-        .Times(1);
-        
-    trans.Make(acc1, acc2, 200);
+    trans.Make(acc1, acc2, 200);  
+
+    std::cout.rdbuf(old);
+
+    std::string output = buffer.str();
+    EXPECT_THAT(output, HasSubstr("1 send to 2 $200"));
+    EXPECT_THAT(output, HasSubstr("Balance 1 is "));
+    EXPECT_THAT(output, HasSubstr("Balance 2 is "));
 }
 
 TEST(TransactionTest, MakeThrowsIfSameAccount) {
-    MockTransaction trans;
+    Transaction trans;
     Account acc1(1, 1000), acc2(1, 1000);
     EXPECT_THROW(trans.Make(acc1, acc2, 100), std::logic_error);
+}
+
+TEST(TransactionTest, MakeThrowsIfNegativeSum) {
+    Transaction trans;
+    Account acc1(1, 1000), acc2(2, 1000);
+    EXPECT_THROW(trans.Make(acc1, acc2, -50), std::invalid_argument);
 }
