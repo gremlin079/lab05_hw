@@ -1,9 +1,8 @@
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include "banking/Account.h"
 #include "banking/Transaction.h"
 
-// Фикстура для тестов Transaction
+// Фикстура для тестов
 class TransactionTest : public ::testing::Test {
 protected:
     void SetUp() override {}
@@ -11,9 +10,9 @@ protected:
 
 // Тест: Проверка успешной транзакции
 TEST_F(TransactionTest, RealTransactionSucceeds) {
-    banking::Account from(1, 1000);
-    banking::Account to(2, 500);
-    banking::Transaction transaction;
+    Account from(1, 1000);
+    Account to(2, 500);
+    Transaction transaction;
 
     from.Unlock();
     to.Unlock();
@@ -26,8 +25,8 @@ TEST_F(TransactionTest, RealTransactionSucceeds) {
 
 // Тест: Проверка исключения при одинаковых счетах
 TEST_F(TransactionTest, MakeThrowsIfSameAccount) {
-    banking::Account account(1, 1000);
-    banking::Transaction transaction;
+    Account account(1, 1000);
+    Transaction transaction;
 
     account.Unlock();
     EXPECT_THROW(transaction.Make(account, account, 300), std::runtime_error);
@@ -35,9 +34,9 @@ TEST_F(TransactionTest, MakeThrowsIfSameAccount) {
 
 // Тест: Проверка исключения при отрицательной сумме
 TEST_F(TransactionTest, MakeThrowsIfNegativeSum) {
-    banking::Account from(1, 1000);
-    banking::Account to(2, 500);
-    banking::Transaction transaction;
+    Account from(1, 1000);
+    Account to(2, 500);
+    Transaction transaction;
 
     from.Unlock();
     to.Unlock();
@@ -46,9 +45,9 @@ TEST_F(TransactionTest, MakeThrowsIfNegativeSum) {
 
 // Тест: Проверка корректности транзакции без комиссии
 TEST_F(TransactionTest, MakeOutputsCorrectInfo) {
-    banking::Account from(1, 1000);
-    banking::Account to(2, 500);
-    banking::Transaction transaction;
+    Account from(1, 1000);
+    Account to(2, 500);
+    Transaction transaction;
 
     from.Unlock();
     to.Unlock();
