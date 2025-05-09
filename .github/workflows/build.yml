@@ -27,7 +27,6 @@ jobs:
       - name: Generate Coverage Data
         run: |
           cd build
-          ./banking_tests || true
           lcov --capture --directory "$PWD" --output-file coverage.info \
                --branch-coverage \
                --no-external \
@@ -35,7 +34,7 @@ jobs:
                --exclude "$PWD/_deps/*" \
                --exclude "/usr/*" \
                --ignore-errors unused,empty
-          lcov --extract coverage.info "$PWD/banking/*" --output-file coverage_filtered.info \
+          lcov --extract coverage.info "$PWD/CMakeFiles/banking.dir/banking/*" --output-file coverage_filtered.info \
                --ignore-errors empty
           genhtml coverage_filtered.info --output-directory coverage_report \
                --branch-coverage \
