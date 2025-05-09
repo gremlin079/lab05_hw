@@ -36,6 +36,9 @@ TEST(TransactionTest, MakeThrowsIfNegativeSum) {
 }
 
 TEST(TransactionTest, RealTransactionSucceeds) {
+    if (from.IsLocked() || to.IsLocked()) {
+        throw std::runtime_error("Account is already locked");
+    }
     Account from(1, 1000);
     Account to(2, 500);
     Transaction t;
