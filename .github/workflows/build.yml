@@ -34,7 +34,7 @@ jobs:
                --exclude "$PWD/_deps/*" \
                --exclude "/usr/*" \
                --ignore-errors unused,empty
-          lcov --extract coverage.info "$PWD/banking/*.cpp" --output-file coverage_filtered.info \
+          lcov --extract coverage.info "$PWD/CMakeFiles/banking.dir/banking/*.gcda" --output-file coverage_filtered.info \
                --ignore-errors empty,unused
           genhtml coverage_filtered.info --output-directory coverage_report \
                --branch-coverage \
