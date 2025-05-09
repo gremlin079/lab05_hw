@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../Account.h"
+#include "banking/Account.h"
 
 class MockAccount : public Account {
 public:
