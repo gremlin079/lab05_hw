@@ -32,6 +32,11 @@ add_executable(banking_tests
     tests/TransactionTest.cpp
 )
 
+if(COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(banking_tests PRIVATE --coverage -fprofile-arcs -ftest-coverage)
+    target_link_libraries(banking_tests PRIVATE --coverage)
+endif()
+
 target_include_directories(banking_tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -45,10 +50,6 @@ target_link_libraries(banking_tests
     gtest_main
 )
 
-if(COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(banking_tests PRIVATE --coverage -fprofile-arcs -ftest-coverage)
-    target_link_libraries(banking_tests PRIVATE --coverage)
-endif()
 
 enable_testing()
 add_test(NAME banking_tests COMMAND banking_tests)
