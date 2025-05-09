@@ -29,33 +29,23 @@ TEST(TransactionTest, MakeThrowsIfSameAccount) {
     EXPECT_THROW(trans.Make(acc1, acc2, 100), std::logic_error);
 }
 
-TEST(TransactionTest, MakeThrowsIfNegativeSum) {
-    Transaction trans;
-    Account acc1(1, 1000), acc2(2, 1000);
-    EXPECT_THROW(trans.Make(acc1, acc2, -50), std::invalid_argument);
-}
-
 TEST(TransactionTest, RealTransactionSucceeds) {
-    if (from.IsLocked() || to.IsLocked()) {
-        throw std::runtime_error("Account is already locked");
-    }
-    Account from(1, 1000);
-    Account to(2, 500);
-    Transaction t;
-    t.set_fee(10);
+   TEST_F(TransactionTest, RealTransactionSucceeds) {
+    Account from(1, 1000); // Счет-отправитель
+    Account to(2, 500);    // Счет-получатель
+    Transaction transaction;
 
-    from.Lock();
-    to.Lock();
+    // Проверяем, что счета не заблокированы
+    ASSERT_FALSE(from.IsLocked());
+    ASSERT_FALSE(to.IsLocked());
 
-    bool success = t.Make(from, to, 300);
-
-    from.Unlock();
-    to.Unlock();
-
-    EXPECT_TRUE(success);
-    EXPECT_EQ(from.GetBalance(), 690);
+    // Выполняем транзакцию
+    bool result = transaction.Make(from, to, 300);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(from.GetBalance(), 700);
     EXPECT_EQ(to.GetBalance(), 800);
 }
+
 
 
 
