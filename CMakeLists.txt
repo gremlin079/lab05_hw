@@ -51,3 +51,10 @@ target_link_libraries(banking_tests
 )
 enable_testing()
 add_test(NAME banking_tests COMMAND banking_tests)
+
+if(COVERAGE)
+    message("Building with coverage")
+    add_compile_options(--coverage)
+    add_link_options(--coverage)
+endif()
+
