@@ -5,13 +5,15 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake lcov gcovr
+          sudo apt-get install -y cmake lcov gcovr python3-pip
+          pip install gcovr
 
       - name: Configure and Build
         run: |
@@ -22,9 +24,11 @@ jobs:
       - name: Run Tests
         run: |
           cd build
-          ctest --output-on-failure || true  # Продолжаем даже если тесты упали
+          ctest --output-on-failure
 
-      - name: Generate Coverage Data
+      - name: Generate and Upload Coverage to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: |
           cd build
           gcovr -r .. \
@@ -33,23 +37,8 @@ jobs:
                 --coveralls \
                 --output=coveralls.json \
                 --gcov-ignore-parse-errors
-          curl -F json_file=@coveralls.json https://coveralls.io/api/v1/jobs
-
-
-      - name: Upload to Coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-        run: |
-          cd build
-          pip install gcovr
-          gcovr -r .. \
-                --exclude='tests/.*' \
-                --exclude='_deps/.*' \
-                --coveralls \
-                --coveralls-pretty \
-                --output=coveralls.json
           curl -X POST \
                -H "Content-Type: application/json" \
                -d @coveralls.json \
                "https://coveralls.io/api/v1/jobs?repo_token=$COVERALLS_REPO_TOKEN"
+
