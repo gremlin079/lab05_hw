@@ -12,7 +12,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake lcov gcovr python3-pip 
+          sudo apt-get install -y cmake lcov gcovr python3-pip
           pip install gcovr
 
       - name: Configure and Build
@@ -26,19 +26,21 @@ jobs:
           cd build
           ctest --output-on-failure
 
-      - name: Generate and Upload Coverage to Coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      - name: Debug Coverage Files
         run: |
           cd build
-          gcovr -r .. \
-                --exclude='tests/.*' \
-                --exclude='_deps/.*' \
-                --coveralls \
-                --output=coveralls.json \
-                --gcov-ignore-parse-errors
-          curl -X POST \
-               -H "Content-Type: application/json" \
-               -d @coveralls.json \
-               "https://coveralls.io/api/v1/jobs?repo_token=$COVERALLS_REPO_TOKEN"
+          find . -name "*.gcda"
+          echo "Checking for coverage files..."
+
+      - name: Generate Coverage Report
+        run: |
+          cd build
+          lcov --capture --directory . --output-file coverage.info
+          lcov --remove coverage.info 'tests/*' '_deps/*' '/usr/*' --output-file coverage.info
+
+      - name: Upload Coverage to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./build/coverage.info
 
