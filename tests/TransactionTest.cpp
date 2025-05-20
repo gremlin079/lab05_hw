@@ -7,18 +7,6 @@ protected:
     void SetUp() override {}
 };
 
-TEST_F(TransactionTest, RealTransactionSucceeds) {
-    Account from(1, 1000);
-    Account to(2, 500);
-    Transaction transaction;
-    from.Unlock();
-    to.Unlock();
-    bool result = transaction.Make(from, to, 300);
-    EXPECT_TRUE(result);
-    EXPECT_EQ(from.GetBalance(), 1000);
-    EXPECT_EQ(to.GetBalance(), 499);
-}
-
 TEST_F(TransactionTest, MakeThrowsIfSameAccount) {
     Account account(1, 1000);
     Transaction transaction;
@@ -35,7 +23,26 @@ TEST_F(TransactionTest, MakeThrowsIfNegativeSum) {
     EXPECT_THROW(transaction.Make(from, to, -100), std::invalid_argument);
 }
 
-TEST_F(TransactionTest, MakeOutputsCorrectInfo) {
+TEST_F(TransactionTest, MakeThrowsIfSumTooSmall) {
+    Account from(1, 1000);
+    Account to(2, 500);
+    Transaction transaction;
+    from.Unlock();
+    to.Unlock();
+    EXPECT_THROW(transaction.Make(from, to, 99), std::logic_error);
+}
+
+TEST_F(TransactionTest, MakeReturnsFalseIfFeeTooHigh) {
+    Account from(1, 1000);
+    Account to(2, 500);
+    Transaction transaction;
+    transaction.set_fee(60); // fee * 2 = 120 > 100
+    from.Unlock();
+    to.Unlock();
+    EXPECT_FALSE(transaction.Make(from, to, 100));
+}
+
+TEST_F(TransactionTest, MakeSuccessWithMinimumSum) {
     Account from(1, 1000);
     Account to(2, 500);
     Transaction transaction;
@@ -43,19 +50,26 @@ TEST_F(TransactionTest, MakeOutputsCorrectInfo) {
     to.Unlock();
     bool result = transaction.Make(from, to, 100);
     EXPECT_TRUE(result);
-    EXPECT_EQ(from.GetBalance(), 1000);
-    EXPECT_EQ(to.GetBalance(), 499);
+    EXPECT_EQ(from.GetBalance(), 899); // 1000 - (100 + 1 fee)
+    EXPECT_EQ(to.GetBalance(), 600);   // 500 + 100
 }
 
-TEST_F(TransactionTest, TransactionCallsChangeBalance) {
-    Account from(1, 1000);
+TEST_F(TransactionTest, MakeFailsWhenInsufficientFunds) {
+    Account from(1, 100); // Not enough for 100 + fee
     Account to(2, 500);
     Transaction transaction;
     from.Unlock();
     to.Unlock();
-    bool result = transaction.Make(from, to, 200);
-    EXPECT_TRUE(result);
-    EXPECT_EQ(from.GetBalance(), 1000);
-    EXPECT_EQ(to.GetBalance(), 499);
+    bool result = transaction.Make(from, to, 100);
+    EXPECT_FALSE(result);
+    EXPECT_EQ(from.GetBalance(), 100); // Should remain unchanged
+    EXPECT_EQ(to.GetBalance(), 500);   // Should remain unchanged
+}
+
+TEST_F(TransactionTest, FeeMethodsWork) {
+    Transaction transaction;
+    EXPECT_EQ(transaction.fee(), 1);
+    transaction.set_fee(10);
+    EXPECT_EQ(transaction.fee(), 10);
 }
 
