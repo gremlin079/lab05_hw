@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(banking)
 
-option(COVERAGE "Enable code coverage" OFF)
+option(COVERAGE "Enable code coverage" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
