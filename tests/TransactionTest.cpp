@@ -55,7 +55,7 @@ TEST_F(TransactionTest, MakeSuccessWithMinimumSum) {
 }
 
 TEST_F(TransactionTest, MakeFailsWhenInsufficientFunds) {
-    Account from(1, 100); // Not enough for 100 + fee
+    Account from(1, 100); // Not enough for 100 + fee (101)
     Account to(2, 500);
     Transaction transaction;
     from.Unlock();
@@ -71,5 +71,22 @@ TEST_F(TransactionTest, FeeMethodsWork) {
     EXPECT_EQ(transaction.fee(), 1);
     transaction.set_fee(10);
     EXPECT_EQ(transaction.fee(), 10);
+}
+
+TEST_F(TransactionTest, BalancesUnchangedWhenTransactionFails) {
+    Account from(1, 50); 
+    Account to(2, 500);
+    Transaction transaction;
+    from.Unlock();
+    to.Unlock();
+    
+    int from_initial = from.GetBalance();
+    int to_initial = to.GetBalance();
+    
+    bool result = transaction.Make(from, to, 100);
+    
+    EXPECT_FALSE(result);
+    EXPECT_EQ(from.GetBalance(), from_initial);
+    EXPECT_EQ(to.GetBalance(), to_initial);
 }
 
